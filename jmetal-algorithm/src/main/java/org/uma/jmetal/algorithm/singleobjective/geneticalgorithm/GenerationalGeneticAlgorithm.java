@@ -27,7 +27,7 @@ import java.util.*;
 /**
  * @author Antonio J. Nebro <antonio@lcc.uma.es>
  */
-public class GenerationalGeneticAlgorithm<S extends Solution<?>> extends AbstractGeneticAlgorithm<S, S> {
+public class GenerationalGeneticAlgorithm<S extends Solution<?>> extends AbstractGeneticAlgorithm<S, List<S>, S> {
   private Comparator<S> comparator;
   private int maxEvaluations;
   private int populationSize;
@@ -66,10 +66,11 @@ public class GenerationalGeneticAlgorithm<S extends Solution<?>> extends Abstrac
       S newIndividual = problem.createSolution();
       population.add(newIndividual);
     }
-    return population;
+    return evaluatePopulation(population);
   }
 
   @Override protected List<S> replacement(List<S> population, List<S> offspringPopulation) {
+    offspringPopulation = evaluatePopulation(offspringPopulation);
     Collections.sort(population, comparator);
     offspringPopulation.add(population.get(0));
     offspringPopulation.add(population.get(1));
@@ -106,7 +107,7 @@ public class GenerationalGeneticAlgorithm<S extends Solution<?>> extends Abstrac
     return matingPopulation;
   }
 
-  @Override protected List<S> evaluatePopulation(List<S> population) {
+  protected List<S> evaluatePopulation(List<S> population) {
     population = evaluator.evaluate(population,problem);
 
     return population;

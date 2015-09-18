@@ -10,14 +10,14 @@ import java.util.List;
  * @param <S> Solution
  * @param <R> Result
  */
-public abstract class AbstractEvolutionaryAlgorithm<S extends Solution<?>, R>  implements Algorithm<R>{
-  private List<S> population;
+public abstract class AbstractEvolutionaryAlgorithm<S extends Solution<?>, Population, R>  implements Algorithm<R>{
+  private Population population;
 
-  public List<S> getPopulation() {
+  public Population getPopulation() {
     return population;
   }
 
-  public void setPopulation(List<S> population) {
+  public void setPopulation(Population population) {
     this.population = population;
   }
 
@@ -27,30 +27,26 @@ public abstract class AbstractEvolutionaryAlgorithm<S extends Solution<?>, R>  i
 
   protected abstract boolean isStoppingConditionReached();
 
-  protected abstract List<S> createInitialPopulation();
+  protected abstract Population createInitialPopulation();
 
-  protected abstract List<S> evaluatePopulation(List<S> population);
+  protected abstract List<S> selection(Population population);
 
-  protected abstract List<S> selection(List<S> population);
+  protected abstract List<S> reproduction(List<S> selectedIndividuals);
 
-  protected abstract List<S> reproduction(List<S> population);
-
-  protected abstract List<S> replacement(List<S> population, List<S> offspringPopulation);
+  protected abstract Population replacement(Population population, List<S> offsprings);
 
   @Override public abstract R getResult();
 
   @Override public void run() {
-    List<S> offspringPopulation;
-    List<S> matingPopulation;
+    List<S> offsprings;
+    List<S> selectedIndividuals;
 
     population = createInitialPopulation();
-    population = evaluatePopulation(population);
     initProgress();
     while (!isStoppingConditionReached()) {
-      matingPopulation = selection(population);
-      offspringPopulation = reproduction(matingPopulation);
-      offspringPopulation = evaluatePopulation(offspringPopulation);
-      population = replacement(population, offspringPopulation);
+      selectedIndividuals = selection(population);
+      offsprings = reproduction(selectedIndividuals);
+      population = replacement(population, offsprings);
       updateProgress();
     }
   }

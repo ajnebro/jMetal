@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * @author Antonio J. Nebro <antonio@lcc.uma.es>
  */
-public class NSGAII<S extends  Solution<?>> extends AbstractGeneticAlgorithm<S, List<S>> {
+public class NSGAII<S extends  Solution<?>> extends AbstractGeneticAlgorithm<S, List<S>, List<S>> {
   protected final int maxIterations;
   protected final int populationSize;
 
@@ -66,10 +66,10 @@ public class NSGAII<S extends  Solution<?>> extends AbstractGeneticAlgorithm<S, 
       S newIndividual = problem.createSolution();
       population.add(newIndividual);
     }
-    return population;
+    return evaluatePopulation(population);
   }
 
-  @Override protected List<S> evaluatePopulation(List<S> population) {
+  protected List<S> evaluatePopulation(List<S> population) {
     population = evaluator.evaluate(population, problem);
 
     return population;
@@ -104,6 +104,7 @@ public class NSGAII<S extends  Solution<?>> extends AbstractGeneticAlgorithm<S, 
   }
 
   @Override protected List<S> replacement(List<S> population, List<S> offspringPopulation) {
+    offspringPopulation = evaluatePopulation(offspringPopulation);
     List<S> jointPopulation = new ArrayList<>();
     jointPopulation.addAll(population);
     jointPopulation.addAll(offspringPopulation);
