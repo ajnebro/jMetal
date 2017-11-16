@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.uma.jmetal.problem.DoubleProblem;
 import org.uma.jmetal.problem.impl.AbstractDoubleProblem;
 import org.uma.jmetal.solution.DoubleSolution;
-import org.uma.jmetal.solution.impl.ArrayDoubleSolution;
 import org.uma.jmetal.solution.impl.DefaultDoubleSolution;
 
 import java.util.ArrayList;
@@ -162,6 +161,7 @@ public class SolutionUtilsTest {
     assertEquals(0.5, SolutionUtils.averageDistanceToSolutionList(solution1, solutionList), EPSILON) ;
   }
 */
+  @SuppressWarnings("serial")
   private class MockedDoubleProblem extends AbstractDoubleProblem {
     public MockedDoubleProblem(int numberOfVariables) {
       setNumberOfVariables(numberOfVariables);

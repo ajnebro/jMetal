@@ -13,6 +13,7 @@ import org.uma.jmetal.util.solutionattribute.impl.NumberOfViolatedConstraints;
 
 import java.util.*;
 
+@SuppressWarnings("serial")
 public class RNSGAIIRanking <S extends Solution<?>> extends GenericSolutionAttribute<S, Integer>
         implements Ranking<S> {
 
@@ -47,7 +48,7 @@ public class RNSGAIIRanking <S extends Solution<?>> extends GenericSolutionAttri
         }
         this.utilityFunctions.setLowerBounds(lowerBound);
         this.utilityFunctions.setUpperBounds(upperBound);
-        List<S> temporalList = new LinkedList();
+        List<S> temporalList = new LinkedList<>();
         temporalList.addAll(population);
         //ordening the solution by weight euclidean distance
 
@@ -55,7 +56,7 @@ public class RNSGAIIRanking <S extends Solution<?>> extends GenericSolutionAttri
         //number of  reference points
         int indexReference =0;
         this.numberOfRanks = population.size()+1;
-        this.rankedSubpopulations = new ArrayList(this.numberOfRanks);
+        this.rankedSubpopulations = new ArrayList<>(this.numberOfRanks);
         for (int i=0; i<numberOfRanks-1;i++){
             this.rankedSubpopulations.add(new ArrayList<>());
         }
@@ -110,7 +111,7 @@ public class RNSGAIIRanking <S extends Solution<?>> extends GenericSolutionAttri
 
                     List<S> rankListAux= this.rankedSubpopulations.get(this.rankedSubpopulations.size()-1 );
                     if(rankListAux==null){
-                        rankListAux= new ArrayList();
+                        rankListAux= new ArrayList<>();
                     }
                     rankListAux.add(solution);
                     temporalList.remove(i);
@@ -152,7 +153,7 @@ public class RNSGAIIRanking <S extends Solution<?>> extends GenericSolutionAttri
         }
 
     public List<S> getSubfront(int rank) {
-        return (List)this.rankedSubpopulations.get(rank);
+        return this.rankedSubpopulations.get(rank);
     }
 
     public int getNumberOfSubfronts() {
