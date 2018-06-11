@@ -132,7 +132,11 @@ public abstract class AbstractGenericSolution<T, P extends Problem<?>> implement
       return false;
     }
 
-    for (Object key : attributes.keySet()) {
+    return equalsattr(that);
+  }
+
+private boolean equalsattr(AbstractGenericSolution<?, ?> that) {
+	for (Object key : attributes.keySet()) {
       Object value      = attributes.get(key);
       Object valueThat  = that.attributes.get(key);
 
@@ -140,16 +144,13 @@ public abstract class AbstractGenericSolution<T, P extends Problem<?>> implement
 
         if (value == null) {
           return false;
-        } else if (valueThat == null) {
+        }
+        if (valueThat == null) {
           return false;
         } else { // both not null
 
           boolean areAttributeValuesEqual;
-          if (value instanceof AbstractGenericSolution) {
-            areAttributeValuesEqual = ((AbstractGenericSolution) value).equalsIgnoringAttributes(valueThat);
-          } else {
-            areAttributeValuesEqual = !value.equals(valueThat);
-          }
+          areAttributeValuesEqual = instance(value, valueThat);
           if (!areAttributeValuesEqual) {
             return false;
           } // if equal the next attributeValue will be checked
@@ -158,7 +159,17 @@ public abstract class AbstractGenericSolution<T, P extends Problem<?>> implement
     }
 
     return true;
-  }
+}
+
+private boolean instance(Object value, Object valueThat) {
+	boolean areAttributeValuesEqual;
+	if (value instanceof AbstractGenericSolution) {
+	    areAttributeValuesEqual = ((AbstractGenericSolution) value).equalsIgnoringAttributes(valueThat);
+	  } else {
+	    areAttributeValuesEqual = !value.equals(valueThat);
+	  }
+	return areAttributeValuesEqual;
+}
 
   @Override public int hashCode() {
     int result = Arrays.hashCode(objectives);
