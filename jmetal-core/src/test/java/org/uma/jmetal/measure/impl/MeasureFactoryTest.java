@@ -2,7 +2,6 @@ package org.uma.jmetal.measure.impl;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.uma.jmetal.measure.MeasureListener;
 import org.uma.jmetal.measure.PullMeasure;
 import org.uma.jmetal.measure.PushMeasure;
 
@@ -46,7 +45,7 @@ public class MeasureFactoryTest {
 		 * ensure that it leads to a proper notification, so it is not ignored.
 		 */
 		final int maxExecutionTime = 5;
-		PullMeasure<Integer> pull = new SimplePullMeasure<Integer>() {
+		PullMeasure<Integer> pull = new PullMeasure<Integer>() {
 			private final Random rand = new Random();
 			private int count = 0;
 
@@ -77,14 +76,8 @@ public class MeasureFactoryTest {
 		// register for notifications from now
 		final long start = System.currentTimeMillis();
 		final LinkedList<Long> timestamps = new LinkedList<>();
-		push.register(new MeasureListener<Integer>() {
-
-			@Override
-			public void measureGenerated(Integer value) {
-				// store the time spent since the registration
-				timestamps.add(System.currentTimeMillis() - start);
-			}
-		});
+		// store the time spent since the registration
+		push.register((value) -> timestamps.add(System.currentTimeMillis() - start));
 
 		// decide the number of notifications to wait for
 		/*
@@ -134,7 +127,7 @@ public class MeasureFactoryTest {
 			throws InterruptedException {
 		// create a pull measure which is always different, thus leading to
 		// generate a notification at every check
-		PullMeasure<Integer> pull = new SimplePullMeasure<Integer>() {
+		PullMeasure<Integer> pull = new PullMeasure<Integer>() {
 
 			int count = 0;
 
@@ -157,13 +150,7 @@ public class MeasureFactoryTest {
 
 		// register for notifications only from now
 		final LinkedList<Integer> timestamps = new LinkedList<>();
-		push.register(new MeasureListener<Integer>() {
-
-			@Override
-			public void measureGenerated(Integer value) {
-				timestamps.add(value);
-			}
-		});
+		push.register((value) -> timestamps.add(value));
 
 		// check no notifications are coming anymore
 		Thread.sleep(10 * period);
@@ -177,7 +164,7 @@ public class MeasureFactoryTest {
 		// create a pull measure which is always different, thus leading to
 		// generate a notification at every check
 		final boolean[] isCalled = { false };
-		PullMeasure<Integer> pull = new SimplePullMeasure<Integer>() {
+		PullMeasure<Integer> pull = new PullMeasure<Integer>() {
 
 			int count = 0;
 
@@ -204,18 +191,12 @@ public class MeasureFactoryTest {
 	}
 
 	@Test
-	@SuppressWarnings("serial")
 	public void testCreatePushFromPullNotifiesOnlyWhenValueChanged()
 			throws InterruptedException {
 		// create a pull measure which changes only when we change the value of
 		// the array
-		final Integer[] value = { null };
-		PullMeasure<Integer> pull = new SimplePullMeasure<Integer>() {
-			@Override
-			public Integer get() {
-				return value[0];
-			}
-		};
+		final Integer[] pulledValue = { null };
+		PullMeasure<Integer> pull = () -> pulledValue[0];
 
 		// create the push measure
 		MeasureFactory factory = new MeasureFactory();
@@ -224,33 +205,27 @@ public class MeasureFactoryTest {
 
 		// register for notifications from now
 		final LinkedList<Integer> notified = new LinkedList<>();
-		push.register(new MeasureListener<Integer>() {
-
-			@Override
-			public void measureGenerated(Integer value) {
-				notified.add(value);
-			}
-		});
+		push.register((value) -> notified.add(value));
 
 		// check no change provide no notifications
 		Thread.sleep(10 * period);
 		assertEquals(0, notified.size());
 
 		// check 1 change provides 1 notification with the correct value
-		value[0] = 56;
+		pulledValue[0] = 56;
 		Thread.sleep(10 * period);
 		assertEquals(1, notified.size());
 		assertEquals(56, (Object) notified.get(0));
 
 		// check 1 more change provides 1 more notification with the new value
-		value[0] = 43;
+		pulledValue[0] = 43;
 		Thread.sleep(10 * period);
 		assertEquals(2, notified.size());
 		assertEquals(56, (Object) notified.get(0));
 		assertEquals(43, (Object) notified.get(1));
 
 		// check 1 more change provides 1 more notification with the new value
-		value[0] = -43;
+		pulledValue[0] = -43;
 		Thread.sleep(10 * period);
 		assertEquals(3, notified.size());
 		assertEquals(56, (Object) notified.get(0));

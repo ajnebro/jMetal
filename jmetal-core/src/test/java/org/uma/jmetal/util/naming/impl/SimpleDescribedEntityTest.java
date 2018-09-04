@@ -1,9 +1,9 @@
 package org.uma.jmetal.util.naming.impl;
 
 import org.junit.Test;
+import org.uma.jmetal.util.naming.DescribedEntity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class SimpleDescribedEntityTest {
 
@@ -29,21 +29,6 @@ public class SimpleDescribedEntityTest {
 		assertEquals("abc", entity.getDescription());
 	}
 
-	class TestedClass extends SimpleDescribedEntity {
-	}
-
-	@Test
-	public void testClassNameWhenNoName() {
-		assertEquals(TestedClass.class.getSimpleName(),
-				new TestedClass().getName());
-	}
-
-	@Test
-	public void testNullDescriptionWhenNoDescription() {
-		assertNull(new SimpleDescribedEntity().getDescription());
-		assertNull(new SimpleDescribedEntity("name").getDescription());
-	}
-
 	@Test
 	public void testCorrectNameWhenProvided() {
 		String name = "named measure";
@@ -59,4 +44,44 @@ public class SimpleDescribedEntityTest {
 				description).getDescription());
 	}
 
+	@Test
+	public void testNullNameForCompleteConstructorWithNullName() {
+		assertNull(new SimpleDescribedEntity(null, "Test").getName());
+	}
+
+	@Test
+	public void testNullDescriptionForCompleteConstructorWithNullDescription() {
+		assertNull(new SimpleDescribedEntity("Test", null).getDescription());
+	}
+
+	@Test
+	public void testNullNameForNameOnlyConstructorWithNullName() {
+		assertNull(new SimpleDescribedEntity(null).getName());
+	}
+
+	@Test
+	public void testDefaultDescriptionForNamleOnlyConstructor() {
+		String expected = new DescribedEntity() {}.getDescription();
+		String actual = new SimpleDescribedEntity("Test").getDescription();
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testDefaultNameForEmptyConstructor() {
+		/*
+		 * This test is simplified one. If someone find out how to get exactly
+		 * the expected value without copy-pasting the default code (which can
+		 * evolve), please consider improving this test.
+		 */
+		String name = new SimpleDescribedEntity().getName();
+		assertNotNull(name);
+		assertFalse(name.isEmpty());
+	}
+
+	@Test
+	public void testDefaultDescriptionForEmptyConstructor() {
+		String expected = new DescribedEntity() {}.getDescription();
+		String actual = new SimpleDescribedEntity().getDescription();
+		assertEquals(expected, actual);
+	}
 }
