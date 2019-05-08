@@ -1,11 +1,12 @@
 package org.uma.jmetal.solution.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.uma.jmetal.problem.IntegerProblem;
 import org.uma.jmetal.solution.IntegerSolution;
+import org.uma.jmetal.util.IndexBounder;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Defines an implementation of an integer solution
@@ -17,37 +18,28 @@ public class DefaultIntegerSolution
     extends AbstractGenericSolution<Integer, IntegerProblem>
     implements IntegerSolution {
 
+  private final IndexBounder<Integer> bounder;
+
   /** Constructor */
   public DefaultIntegerSolution(IntegerProblem problem) {
-    super(problem) ;
-
-    initializeIntegerVariables(JMetalRandom.getInstance());
-    initializeObjectiveValues();
+    super(variablesInitializer(problem, JMetalRandom.getInstance()), problem.getNumberOfObjectives()) ;
+    this.bounder = problem;
   }
 
   /** Copy constructor */
   public DefaultIntegerSolution(DefaultIntegerSolution solution) {
-    super(solution.problem) ;
-
-    for (int i = 0; i < problem.getNumberOfVariables(); i++) {
-      setVariableValue(i, solution.getVariableValue(i));
-    }
-
-    for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-      setObjective(i, solution.getObjective(i)) ;
-    }
-
-    attributes = new HashMap<Object, Object>(solution.attributes) ;
+    super(solution) ;
+    this.bounder = solution.bounder;
   }
 
   @Override
   public Integer getUpperBound(int index) {
-    return problem.getUpperBound(index);
+    return bounder.getUpperBound(index);
   }
 
   @Override
   public Integer getLowerBound(int index) {
-    return problem.getLowerBound(index) ;
+    return bounder.getLowerBound(index) ;
   }
 
   @Override
@@ -60,16 +52,12 @@ public class DefaultIntegerSolution
     return getVariableValue(index).toString() ;
   }
   
-  private void initializeIntegerVariables(JMetalRandom randomGenerator) {
-    for (int i = 0 ; i < problem.getNumberOfVariables(); i++) {
-      Integer value = randomGenerator.nextInt(getLowerBound(i), getUpperBound(i));
-      setVariableValue(i, value) ;
+  private static List<Integer> variablesInitializer(IntegerProblem problem, JMetalRandom randomGenerator) {
+    int numberOfVariables = problem.getNumberOfVariables();
+    List<Integer> variables = new ArrayList<>(numberOfVariables);
+    for (int i = 0 ; i < numberOfVariables; i++) {
+      variables.add(randomGenerator.nextInt(problem.getLowerBound(i), problem.getUpperBound(i))) ;
     }
+    return variables;
   }
-  
-  
-	@Override
-	public Map<Object, Object> getAttributes() {
-		return attributes;
-	}
 }

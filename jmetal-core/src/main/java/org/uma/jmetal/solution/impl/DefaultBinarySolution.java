@@ -5,8 +5,11 @@ import org.uma.jmetal.solution.BinarySolution;
 import org.uma.jmetal.util.binarySet.BinarySet;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Defines an implementation of a binary solution
@@ -20,25 +23,14 @@ public class DefaultBinarySolution
 
   /** Constructor */
   public DefaultBinarySolution(BinaryProblem problem) {
-    super(problem) ;
-
-    initializeBinaryVariables(JMetalRandom.getInstance());
-    initializeObjectiveValues();
+    super(variablesInitializer(problem, JMetalRandom.getInstance()), problem.getNumberOfObjectives()) ;
   }
 
   /** Copy constructor */
   public DefaultBinarySolution(DefaultBinarySolution solution) {
-    super(solution.problem);
-
-    for (int i = 0; i < problem.getNumberOfVariables(); i++) {
-      setVariableValue(i, (BinarySet) solution.getVariableValue(i).clone());
-    }
-
-    for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-      setObjective(i, solution.getObjective(i)) ;
-    }
-
-    attributes = new HashMap<Object, Object>(solution.attributes) ;
+    super(solution.getVariables().stream().map(s -> (BinarySet) s.clone()).collect(Collectors.toList()),
+        Arrays.copyOf(solution.getObjectives(), solution.getObjectives().length),
+        new HashMap<>(solution.getAttributes()));
   }
 
   private static BinarySet createNewBitSet(int numberOfBits, JMetalRandom randomGenerator) {
@@ -89,14 +81,12 @@ public class DefaultBinarySolution
     return result ;
   }
   
-  private void initializeBinaryVariables(JMetalRandom randomGenerator) {
-    for (int i = 0; i < problem.getNumberOfVariables(); i++) {
-      setVariableValue(i, createNewBitSet(problem.getNumberOfBits(i), randomGenerator));
+  private static List<BinarySet> variablesInitializer(BinaryProblem problem, JMetalRandom randomGenerator) {
+    int numberOfVariables = problem.getNumberOfVariables();
+    List<BinarySet> variables = new ArrayList<>(numberOfVariables);
+    for (int i = 0; i < numberOfVariables; i++) {
+      variables.add(createNewBitSet(problem.getNumberOfBits(i), randomGenerator));
     }
+    return variables;
   }
-
-	@Override
-	public Map<Object, Object> getAttributes() {
-		return attributes;
-	}
 }
