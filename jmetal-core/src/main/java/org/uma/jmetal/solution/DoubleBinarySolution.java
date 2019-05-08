@@ -1,13 +1,16 @@
 package org.uma.jmetal.solution;
 
+import org.uma.jmetal.util.IndexBounder;
+
 /**
  * Interface representing a solution having an array of real values and a bitset
  *
  * @author Antonio J. Nebro <antonio@lcc.uma.es>
+ * @deprecated Not used. For examples of multiple encodings, consider
+ *             {@link IntegerDoubleSolution} instead.
  */
-public interface DoubleBinarySolution extends Solution<Object>{
+@Deprecated
+public interface DoubleBinarySolution extends Solution<Object>, IndexBounder<Double>{
   public int getNumberOfDoubleVariables() ;
-  public Double getLowerBound(int index) ;
-  public Double getUpperBound(int index) ;
   public int getNumberOfBits() ;
 }

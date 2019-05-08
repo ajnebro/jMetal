@@ -1,11 +1,12 @@
 package org.uma.jmetal.solution.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.uma.jmetal.problem.DoubleProblem;
 import org.uma.jmetal.solution.DoubleSolution;
+import org.uma.jmetal.util.IndexBounder;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Defines an implementation of a double solution
@@ -17,37 +18,28 @@ public class DefaultDoubleSolution
     extends AbstractGenericSolution<Double, DoubleProblem>
     implements DoubleSolution {
 
+  private final IndexBounder<Double> bounder;
+
   /** Constructor */
   public DefaultDoubleSolution(DoubleProblem problem) {
-    super(problem) ;
-
-    initializeDoubleVariables(JMetalRandom.getInstance());
-    initializeObjectiveValues();
+    super(variablesInitializer(problem, JMetalRandom.getInstance()), problem.getNumberOfObjectives()) ;
+    this.bounder = problem;
   }
 
   /** Copy constructor */
   public DefaultDoubleSolution(DefaultDoubleSolution solution) {
-    super(solution.problem) ;
-
-    for (int i = 0; i < problem.getNumberOfVariables(); i++) {
-      setVariableValue(i, solution.getVariableValue(i));
-    }
-
-    for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-      setObjective(i, solution.getObjective(i)) ;
-    }
-
-    attributes = new HashMap<Object, Object>(solution.attributes) ;
+    super(solution) ;
+    this.bounder = solution.bounder;
   }
 
   @Override
   public Double getUpperBound(int index) {
-    return problem.getUpperBound(index);
+    return bounder.getUpperBound(index);
   }
 
   @Override
   public Double getLowerBound(int index) {
-    return problem.getLowerBound(index) ;
+    return bounder.getLowerBound(index) ;
   }
 
   @Override
@@ -60,15 +52,12 @@ public class DefaultDoubleSolution
     return getVariableValue(index).toString() ;
   }
   
-  private void initializeDoubleVariables(JMetalRandom randomGenerator) {
-    for (int i = 0 ; i < problem.getNumberOfVariables(); i++) {
-      Double value = randomGenerator.nextDouble(getLowerBound(i), getUpperBound(i)) ;
-      setVariableValue(i, value) ;
+  private static List<Double> variablesInitializer(DoubleProblem problem, JMetalRandom randomGenerator) {
+    int numberOfVariables = problem.getNumberOfVariables();
+    List<Double> variables = new ArrayList<>(numberOfVariables);
+    for (int i = 0; i < numberOfVariables; i++) {
+      variables.add(randomGenerator.nextDouble(problem.getLowerBound(i), problem.getUpperBound(i)));
     }
+    return variables;
   }
-  
-	@Override
-	public Map<Object, Object> getAttributes() {
-		return attributes;
-	}
 }
