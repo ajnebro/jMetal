@@ -4,8 +4,7 @@ import org.uma.jmetal.problem.IntegerDoubleProblem;
 import org.uma.jmetal.solution.IntegerDoubleSolution;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Defines an implementation of a class for solutions having integers and doubles
@@ -22,32 +21,15 @@ public class DefaultIntegerDoubleSolution
 
   /** Constructor */
   public DefaultIntegerDoubleSolution(IntegerDoubleProblem<?> problem) {
-    super(problem) ;
+    super(problem, variableInitializer(problem)) ;
 
     numberOfIntegerVariables = problem.getNumberOfIntegerVariables() ;
     numberOfDoubleVariables = problem.getNumberOfDoubleVariables() ;
-
-    initializeIntegerDoubleVariables(JMetalRandom.getInstance()) ;
-    initializeObjectiveValues() ;
   }
 
   /** Copy constructor */
   public DefaultIntegerDoubleSolution(DefaultIntegerDoubleSolution solution) {
-    super(solution.problem) ;
-
-    for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-      setObjective(i, solution.getObjective(i)) ;
-    }
-
-    for (int i = 0 ; i < numberOfIntegerVariables; i++) {
-      setVariableValue(i, solution.getVariableValue(i)) ;
-    }
-
-    for (int i = numberOfIntegerVariables ; i < (numberOfIntegerVariables+numberOfDoubleVariables); i++) {
-      setVariableValue(i, solution.getVariableValue(i)) ;
-    }
-
-    attributes = new HashMap<Object, Object>(solution.attributes) ;
+    super(solution.problem, solution) ;
   }
 
   @Override
@@ -80,20 +62,16 @@ public class DefaultIntegerDoubleSolution
     return getVariableValue(index).toString() ;
   }
   
-  private void initializeIntegerDoubleVariables(JMetalRandom randomGenerator) {
-    for (int i = 0 ; i < numberOfIntegerVariables; i++) {
-      Integer value = randomGenerator.nextInt((Integer)getLowerBound(i), (Integer)getUpperBound(i)) ;
-      setVariableValue(i, value) ;
-    }
-
-    for (int i = numberOfIntegerVariables ; i < getNumberOfVariables(); i++) {
-      Double value = randomGenerator.nextDouble((Double)getLowerBound(i), (Double)getUpperBound(i)) ;
-      setVariableValue(i, value) ;
-    }
+  private static Function<Integer, Number> variableInitializer(IntegerDoubleProblem<?> problem) {
+    return i -> {
+      Number lowerBound = problem.getLowerBound(i);
+      Number upperBound = problem.getUpperBound(i);
+      JMetalRandom randomGenerator = JMetalRandom.getInstance();
+      if (i < problem.getNumberOfIntegerVariables()) {
+        return randomGenerator.nextInt((Integer) lowerBound, (Integer) upperBound);
+      } else {
+        return randomGenerator.nextDouble((Double) lowerBound, (Double) upperBound);
+      }
+    };
   }
-  
-	@Override
-	public Map<Object, Object> getAttributes() {
-		return attributes;
-	}
 }

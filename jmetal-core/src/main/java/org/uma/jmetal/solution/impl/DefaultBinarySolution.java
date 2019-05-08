@@ -6,7 +6,6 @@ import org.uma.jmetal.util.binarySet.BinarySet;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Defines an implementation of a binary solution
@@ -23,22 +22,12 @@ public class DefaultBinarySolution
     super(problem) ;
 
     initializeBinaryVariables(JMetalRandom.getInstance());
-    initializeObjectiveValues();
   }
 
   /** Copy constructor */
   public DefaultBinarySolution(DefaultBinarySolution solution) {
-    super(solution.problem);
-
-    for (int i = 0; i < problem.getNumberOfVariables(); i++) {
-      setVariableValue(i, (BinarySet) solution.getVariableValue(i).clone());
-    }
-
-    for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-      setObjective(i, solution.getObjective(i)) ;
-    }
-
-    attributes = new HashMap<Object, Object>(solution.attributes) ;
+    super(solution.problem, i -> (BinarySet) solution.getVariableValue(i).clone(), solution::getObjective,
+        new HashMap<>(solution.getAttributes()));
   }
 
   private static BinarySet createNewBitSet(int numberOfBits, JMetalRandom randomGenerator) {
@@ -94,9 +83,4 @@ public class DefaultBinarySolution
       setVariableValue(i, createNewBitSet(problem.getNumberOfBits(i), randomGenerator));
     }
   }
-
-	@Override
-	public Map<Object, Object> getAttributes() {
-		return attributes;
-	}
 }

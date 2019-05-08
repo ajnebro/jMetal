@@ -4,9 +4,6 @@ import org.uma.jmetal.problem.DoubleProblem;
 import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Defines an implementation of a double solution
  *
@@ -22,22 +19,11 @@ public class DefaultDoubleSolution
     super(problem) ;
 
     initializeDoubleVariables(JMetalRandom.getInstance());
-    initializeObjectiveValues();
   }
 
   /** Copy constructor */
   public DefaultDoubleSolution(DefaultDoubleSolution solution) {
-    super(solution.problem) ;
-
-    for (int i = 0; i < problem.getNumberOfVariables(); i++) {
-      setVariableValue(i, solution.getVariableValue(i));
-    }
-
-    for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-      setObjective(i, solution.getObjective(i)) ;
-    }
-
-    attributes = new HashMap<Object, Object>(solution.attributes) ;
+    super(solution.problem, solution) ;
   }
 
   @Override
@@ -66,9 +52,4 @@ public class DefaultDoubleSolution
       setVariableValue(i, value) ;
     }
   }
-  
-	@Override
-	public Map<Object, Object> getAttributes() {
-		return attributes;
-	}
 }
