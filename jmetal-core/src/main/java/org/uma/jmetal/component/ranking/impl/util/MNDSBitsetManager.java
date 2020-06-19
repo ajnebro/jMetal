@@ -11,7 +11,6 @@ public class MNDSBitsetManager {
 	private final static int FIRST_WORD_RANGE = 0;
 	private final static int LAST_WORD_RANGE = 1;
 	private final static int N_BIT_ADDR = 6;
-	private final static int WORD_SIZE = 1 << N_BIT_ADDR;
 	private static final long WORD_MASK = 0xffffffffffffffffL;
 	private long[][] bitsets; //N bitsets. Each solution has a bitset
 	private int[][] bsRanges; //N ranges [first sol - last sol]. Each of each bitset of each solution
@@ -20,15 +19,6 @@ public class MNDSBitsetManager {
 	private int maxRank;
 	private long[] incrementalBitset;
 	private int incBsFstWord, incBsLstWord;
-
-	public void freeMem() {
-		incrementalBitset = null;
-		bitsets = null;
-		bsRanges = null;
-		wordRanking = null;
-		ranking = null;
-		ranking0 = null;
-	}
 
 	public int[] getRanking() {
 		return ranking0;
@@ -64,19 +54,24 @@ public class MNDSBitsetManager {
 			fw = incBsFstWord;
 		if (fw > lw)
 			return;
-		long word;
-		int i = 0, rank = 0, offset;
+
+		int rank = 0;
+		long[] solutionBS = bitsets[solutionId];
 		for (; fw <= lw; fw++) {
-			word = bitsets[solutionId][fw] & incrementalBitset[fw];
+			long word = solutionBS[fw] & incrementalBitset[fw];
 			if (word != 0) {
-				i = Long.numberOfTrailingZeros(word);
-				offset = fw * WORD_SIZE;
+				int offset = fw << N_BIT_ADDR;
+				int thisWordRanking = wordRanking[fw];
 				do {
-					if (ranking[offset + i] >= rank)
+					int i = Long.numberOfTrailingZeros(word);
+					if (ranking[offset + i] >= rank) {
 						rank = ranking[offset + i] + 1;
-					i++;
-					i += Long.numberOfTrailingZeros(word >> i);
-				} while (i < WORD_SIZE && rank <= wordRanking[fw]);
+						if (rank > thisWordRanking) {
+							break;
+						}
+					}
+					word &= word - 1;
+				} while (word != 0);
 				if (rank > maxRank) {
 					maxRank = rank;
 					break;
@@ -85,9 +80,10 @@ public class MNDSBitsetManager {
 		}
 		ranking[solutionId] = rank;
 		ranking0[initSolId] = rank;
-		i = solutionId >> N_BIT_ADDR;
-		if (rank > wordRanking[i])
+		int i = solutionId >> N_BIT_ADDR;
+		if (rank > wordRanking[i]) {
 			wordRanking[i] = rank;
+		}
 	}
 
 	public void updateIncrementalBitset(int solutionId) {
@@ -115,7 +111,7 @@ public class MNDSBitsetManager {
 			return intersection != 0;
 		}
 		//more than one word in common
-		int lw = incBsLstWord < wordIndex ? incBsLstWord : wordIndex;
+		int lw = Math.min(incBsLstWord, wordIndex);
 		bsRanges[solutionId][FIRST_WORD_RANGE] = incBsFstWord;
 		bsRanges[solutionId][LAST_WORD_RANGE] = lw;
 		bitsets[solutionId] = new long[lw + 1];
