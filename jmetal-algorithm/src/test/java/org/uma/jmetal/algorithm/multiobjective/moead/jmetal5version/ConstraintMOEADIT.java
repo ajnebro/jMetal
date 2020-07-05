@@ -27,12 +27,12 @@ public class ConstraintMOEADIT {
 
     double cr = 1.0;
     double f = 0.5;
-    CrossoverOperator<DoubleSolution> crossover = new DifferentialEvolutionCrossover(cr, f,
+    CrossoverOperator<DoubleSolution> crossover = new DifferentialEvolutionCrossover<>(cr, f,
             DifferentialEvolutionCrossover.DE_VARIANT.RAND_1_BIN);
 
     double mutationProbability = 1.0 / problem.getNumberOfVariables();
     double mutationDistributionIndex = 20.0;
-    MutationOperator<DoubleSolution> mutation = new PolynomialMutation(mutationProbability,
+    MutationOperator<DoubleSolution> mutation = new PolynomialMutation<>(mutationProbability,
         mutationDistributionIndex);
 
     algorithm = new MOEADBuilder(problem, Variant.ConstraintMOEAD)
@@ -61,12 +61,12 @@ public class ConstraintMOEADIT {
 
     double cr = 1.0;
     double f = 0.5;
-    CrossoverOperator<DoubleSolution> crossover = new DifferentialEvolutionCrossover(cr, f,
+    CrossoverOperator<DoubleSolution> crossover = new DifferentialEvolutionCrossover<>(cr, f,
             DifferentialEvolutionCrossover.DE_VARIANT.RAND_1_BIN);
 
     double mutationProbability = 1.0 / problem.getNumberOfVariables();
     double mutationDistributionIndex = 20.0;
-    MutationOperator<DoubleSolution> mutation = new PolynomialMutation(mutationProbability,
+    MutationOperator<DoubleSolution> mutation = new PolynomialMutation<>(mutationProbability,
         mutationDistributionIndex);
 
     algorithm = new MOEADBuilder(problem, Variant.ConstraintMOEAD)

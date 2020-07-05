@@ -61,7 +61,7 @@ public class Ensemble2DNSGAIISMPSOMOEAD extends AbstractAlgorithmRunner {
                 populationSize,
                 offspringPopulationSize,
                 new SBXCrossover(crossoverProbability, crossoverDistributionIndex),
-                new PolynomialMutation(mutationProbability, mutationDistributionIndex),
+                new PolynomialMutation<>(mutationProbability, mutationDistributionIndex),
                 termination)
             .withArchive(new NonDominatedSolutionListArchive<>());
 
@@ -76,7 +76,7 @@ public class Ensemble2DNSGAIISMPSOMOEAD extends AbstractAlgorithmRunner {
             (DoubleProblem) problem,
             swarmSize,
             leadersArchive,
-            new PolynomialMutation(mutationProbability, mutationDistributionIndex),
+            new PolynomialMutation<>(mutationProbability, mutationDistributionIndex),
             evaluation,
             termination,
             new NonDominatedSolutionListArchive<>());
@@ -91,7 +91,7 @@ public class Ensemble2DNSGAIISMPSOMOEAD extends AbstractAlgorithmRunner {
     AggregativeFunction aggregativeFunction = new Tschebyscheff();
 
     Algorithm<List<DoubleSolution>> moead =
-        new MOEADDE(
+        new MOEADDE<>(
                 problem,
                 300,
                 cr,
