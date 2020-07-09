@@ -50,12 +50,12 @@ public class MOEADDRARunner extends AbstractAlgorithmRunner {
     double cr = 1.0;
     double f = 0.5;
     crossover =
-        new DifferentialEvolutionCrossover(
+        DifferentialEvolutionCrossover.createFromVariant(
             cr, f, DifferentialEvolutionCrossover.DE_VARIANT.RAND_1_BIN);
 
     double mutationProbability = 1.0 / problem.getNumberOfVariables();
     double mutationDistributionIndex = 20.0;
-    mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex);
+    mutation = PolynomialMutation.createWithDoubleDefaults(mutationProbability, mutationDistributionIndex);
 
     algorithm =
         new MOEADBuilder(problem, MOEADBuilder.Variant.MOEADDRA)

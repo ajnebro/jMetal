@@ -55,15 +55,15 @@ public class MOEADDEComponentBasedConfigurationExample extends AbstractAlgorithm
     double cr = 1.0;
     double f = 0.5;
     crossover =
-        new DifferentialEvolutionCrossover(
+        DifferentialEvolutionCrossover.createFromVariant(
             cr, f, DifferentialEvolutionCrossover.DE_VARIANT.RAND_1_BIN);
 
     double mutationProbability = 1.0 / problem.getNumberOfVariables();
     double mutationDistributionIndex = 20.0;
-    mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex);
+    mutation = PolynomialMutation.createWithDoubleDefaults(mutationProbability, mutationDistributionIndex);
 
     DifferentialCrossoverVariation variation =
-        new DifferentialCrossoverVariation(1, crossover, mutation, subProblemIdGenerator);
+        DifferentialCrossoverVariation.createWithDefaultMatingPoolSize(1, crossover, mutation, subProblemIdGenerator);
 
     double neighborhoodSelectionProbability = 0.9;
     int neighborhoodSize = 20;
@@ -91,7 +91,7 @@ public class MOEADDEComponentBasedConfigurationExample extends AbstractAlgorithm
     Evaluation<DoubleSolution> evaluation = new SequentialEvaluation<>(problem);
 
     algorithm =
-        new MOEADDE(
+        MOEADDE.create(
             evaluation,
             new RandomSolutionsCreation<>(problem, populationSize),
             new TerminationByEvaluations(150000),
